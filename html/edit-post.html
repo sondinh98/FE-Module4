@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.slim.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+</head>
+<body>
+<form >
+    <h2>Chinh Sua Bai Viet</h2>
+    <input id="idUserAcc" type="hidden">
+    <input id="idPost" type="hidden">
+    <label>Ngay tao</label><br>
+    <input type="text" id="createDate"  disabled>
+    <br><br>
+    <label>Content:</label><br>
+    <textarea id="content"></textarea>
+    <br><br>
+    <label >Img:</label><br>
+    <input type="int" id="img"  required>
+    <br><br>
+    <label >Video:</label><br>
+    <input type="text" id="video"  required>
+    <br><br>
+    <label >Like Count:</label><br>
+    <input type="text" id="likeCount"  disabled>
+    <br><br>
+    <label >Comment Count:</label><br>
+    <input type="text" id="commentCount"  disabled>
+    <br><br>
+    <label >Share Count:</label><br>
+    <input type="text" id="shareCount"  disabled>
+    <br><br>
+
+    <br><br>
+    <a onclick="updatePost()" class="btn btn-primary">Update</a>
+    <br><br>
+    <a href="time-line.html">Back</a>
+</form>
+
+
+</body>
+</html>
+<script>
+    $(document).ready(function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get("postId");
+        $.ajax({
+            type: "GET",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            },
+            url: "http://localhost:8080/posts/" + id,
+            success: function (data) {
+                $("#idPost").val(data.id);
+                $("#idUserAcc").val(data.userAcc.id);
+                $("#createDate").val(data.createDate);
+                $("#content").val(data.content);
+                $("#img").val(data.img);
+                $("#video").val(data.video);
+                $("#likeCount").val(data.likeCount);
+                $("#commentCount").val(data.commentCount);
+                $("#shareCount").val(data.shareCount);
+            },
+            error: function (err) {
+                console.log("loi123")
+            }
+        })
+    });
+    function updatePost() {
+        let userAccid = $("#idUserAcc").val();
+        let createDate = $("#createDate").val();
+        let content = $("#content").val();
+        let img = $("#img").val();
+        let video = $("#video").val();
+        let likeCount = $("#likeCount").val()
+        let commentCount = $("#commentCount").val()
+        let shareCount = $("#shareCount").val()
+        let idPost = $("#idPost").val()
+        let post = {
+            userAcc: {
+                id: userAccid
+            },
+            content: content,
+            img: img,
+            video: video,
+            createDate: createDate,
+            likeCount: likeCount,
+            commentCount: commentCount,
+            shareCount: shareCount
+
+        }
+        $.ajax({
+            type: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            },
+            url: "http://localhost:8080/posts/edit/" + idPost,
+            data:JSON.stringify(post),
+
+            success: function (){
+                const userAcc = localStorage.getItem('user');
+               let userAccOjb = JSON.parse(userAcc)
+                let userAccId = userAccOjb.id
+                window.location.href = `time-line.html?userAccId=` + userAccId;
+            },
+            error: function (err) {
+                console.log("loix")
+            }
+        })
+    }
+</script>
